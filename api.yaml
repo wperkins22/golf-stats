@@ -1,0 +1,378 @@
+openapi: 3.0.1
+info:
+  title: Golf Stats
+  version: 1.0.0
+  description: An api for interacting with my personal golf statistics database
+paths:
+  /round:
+    summary: Golf round data
+    description: This path deals with data related to rounds of golf
+    get:
+      summary: Get all rounds
+      description: Retrieve all rounds data from the database
+      operationId: get_rounds
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                All Rounds:
+                  value: >-
+                    [{"id": 1, "date": "1999-01-01", "front_9_score": 36,
+                    "back_9_score": 36, "total_score": 72, "course_id": 8},
+                    {"id": 2, "date": "1999-01-02", "front_9_score": 72,
+                    "back_9_score": 72, "total_score": 144, "course_id": 2}]
+          description: Success
+      tags:
+        - Get Rounds
+    post:
+      summary: Add round
+      description: Add a round's data to the database
+      operationId: add_round
+      requestBody:
+        description: >-
+          The round's date, front 9 score, back 9 score, total score, and course
+          ID
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  description: The date of the round
+                front_9_score:
+                  type: number
+                  description: The front 9 score for the round
+                back_9_score:
+                  type: number
+                  description: The back 9 score for the round
+                total_score:
+                  type: number
+                  description: The total score for the round
+                course_id:
+                  type: number
+                  description: The ID of the course where the round was played
+      responses:
+        '201':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Round ID 1:
+                  value: 'Round added with ID: 1'
+          description: Created
+        default:
+          description: Default error sample response
+      tags:
+        - Add Rounds
+    delete:
+      summary: Delete all rounds
+      description: Delete all rounds data from the database
+      operationId: delete_rounds
+      responses:
+        '204':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                All Rounds:
+                  value: All rounds deleted.
+          description: No Content
+      tags:
+        - Delete Rounds
+  /round/{id}:
+    summary: Golf round data by ID
+    description: This path deals with golf round data by round ID
+    parameters:
+      - name: id
+        in: path
+        description: The ID of the round
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a round
+      description: Get a single round data by ID
+      operationId: get_round
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                Round ID 1:
+                  value: >-
+                    {"id": 1, "date": "1999-01-01", "front_9_score": 36,
+                    "back_9_score": 36, "total_score": 72, "course_id": 8}
+          description: Success
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Round ID -1:
+                  value: 'Round with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Get Rounds
+    put:
+      summary: Update round
+      description: Update a round data by ID
+      operationId: update_round
+      requestBody:
+        description: >-
+          The round's date, front 9 score, back 9 score, total score, and course
+          ID
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  description: The date of the round
+                front_9_score:
+                  type: number
+                  description: The front 9 score for the round
+                back_9_score:
+                  type: number
+                  description: The back 9 score for the round
+                total_score:
+                  type: number
+                  description: The total score for the round
+                course_id:
+                  type: number
+                  description: The ID of the course where the round was played
+      responses:
+        '201':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Round ID 1:
+                  value: 'Updated round with ID: 1'
+          description: Created
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Round ID -1:
+                  value: 'Round with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Update Rounds
+    delete:
+      summary: Delete round
+      description: Delete a single round by ID
+      operationId: delete_round
+      responses:
+        '204':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Round ID 1:
+                  value: 'Round with ID: 1 deleted'
+          description: No Content
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Round ID -1:
+                  value: 'Round with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Delete Rounds
+  /course:
+    summary: Golf course data
+    description: This path deals with data related to golf courses
+    get:
+      summary: Get all courses
+      description: Retrieve all courses data from the database
+      operationId: get_courses
+      parameters:
+        - name: course_name
+          in: query
+          description: The name of the course to search
+          required: false
+          schema:
+            type: string
+        - name: course_state
+          in: query
+          description: The state that the course is located in
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                All Courses:
+                  value: >-
+                    [{"id": 1, "name": "The Golf Course", "rating": 73.2,
+                    "slope": 113, "length_yd": 7000, "public": true,
+                    "location_city": "Cityville", "location_state": "CO"},
+                    {"id": 2, "name": "The Better Golf Course", "rating": 72.9,
+                    "slope": 114, "length_yd": 7001, "public": true,
+                    "location_city": "Citytown", "location_state": "CO"}, {"id":
+                    3, "name": "The Best Golf Course", "rating": 74.5, "slope":
+                    110, "length_yd": 6969, "public": false, "location_city":
+                    "City City", "location_state": "AK"}]
+                Course by Course Name "The Golf Course":
+                  value: >-
+                    {"id": 1, "name": "The Golf Course", "rating": 73.2,
+                    "slope": 113, "length_yd": 7000, "public": true,
+                    "location_city": "Cityville", "location_state": "CO"}
+                Course by State "CO":
+                  value: >-
+                    [{"id": 1, "name": "The Golf Course", "rating": 73.2,
+                    "slope": 113, "length_yd": 7000, "public": true,
+                    "location_city": "Cityville", "location_state": "CO"},
+                    {"id": 2, "name": "The Better Golf Course", "rating": 72.9,
+                    "slope": 114, "length_yd": 7001, "public": true,
+                    "location_city": "Citytown", "location_state": "CO"}]
+          description: Success
+      tags:
+        - Get Courses
+    post:
+      summary: Add new course
+      description: Add new course data to the database
+      operationId: add_course
+      requestBody:
+        description: The course's name, rating, slope, length, public flag, city, and state
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the course
+                rating:
+                  type: number
+                  description: The course's rating
+                slope:
+                  type: number
+                  description: The course's slope rating
+                length_yd:
+                  type: number
+                  description: The length of the course in yards
+                public:
+                  type: number
+                  description: True if the course is public, false if not
+                location_city:
+                  type: string
+                  description: The city that the course is located in
+                location_state:
+                  type: string
+                  description: The state that the course is located in
+      responses:
+        '201':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                New Course ID 1:
+                  value: 'Course added with ID: 1'
+          description: Created
+      tags:
+        - Add Courses
+  /course/{id}:
+    summary: Golf course data by ID
+    description: This path deals with golf course data by course ID
+    parameters:
+      - name: id
+        in: path
+        description: The ID of the course
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get course
+      description: Get a single course data from the database by ID
+      operationId: get_course
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                Course ID 1:
+                  value: |-
+                    {"id": 1, "name": "The Golf Course", "rating": 73.2,
+                                        "slope": 113, "length_yd": 7000, "public": true,
+                                        "location_city": "Cityville", "location_state": "CO"}
+          description: Success
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Course ID -1:
+                  value: 'Course with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Get Courses
+    put:
+      summary: Update course
+      description: Update a course data in the database by ID
+      operationId: update_course
+      requestBody:
+        description: The course's name, rating, slope, length, public flag, city, and state
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the course
+                rating:
+                  type: number
+                  description: The course's rating
+                slope:
+                  type: number
+                  description: The course's slope rating
+                length_yd:
+                  type: number
+                  description: The length of the course in yards
+                public:
+                  type: number
+                  description: True if the course is public, false if not
+                location_city:
+                  type: string
+                  description: The city that the course is located in
+                location_state:
+                  type: string
+                  description: The state that the course is located in
+      responses:
+        '201':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Course ID 1:
+                  value: 'Course updated with ID: 1'
+          description: Created
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Course ID -1:
+                  value: 'Course with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Update Courses
+    delete:
+      summary: Delete a course
+      description: Delete a single course data from the database by ID
+      operationId: delete_course
+      responses:
+        '204':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Course ID 1:
+                  value: 'Course deleted with ID: 1'
+          description: No Content
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Course ID -1:
+                  value: 'Course with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Delete Courses
