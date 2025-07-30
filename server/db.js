@@ -12,15 +12,40 @@ const pool = new Pool({
 
 // select all courses from course table
 const getAllCourses = async (req, res, next) => {
-    await pool.query(
-        'SELECT * FROM course',
-        (error, results) => {
-            if (error) {
-                next(error);
+    console.log('In getAllCourses');
+    if (!req.query.name && !req.query.location_state) {
+        console.log('In if (!req.query.name && !req.query.location_state)');
+        await pool.query(
+            'SELECT * FROM course',
+            (error, results) => {
+                if (error) {
+                    next(error);
+                }
+                res.status(200).json(results.rows);
             }
-            res.status(200).json(results.rows);
+        );
+    } else {
+        console.log('In else');
+        if (req.query.name) {
+            console.log('In if(req.query.name)');
+            const name = req.query.name;
+            const results = await pool.query('SELECT * FROM course WHERE name = $1', [name]);
+            if (!results.rows[0]) {
+                res.status(404).send(`Course(s) with name: ${name} not found`);
+            } else {
+                res.status(200).send(results.rows);
+            }
+        } else if (req.query.location_state) {
+            console.log('In if (req.query.state)');
+            const location_state = req.query.location_state;
+            const results = await pool.query('SELECT * FROM course WHERE location_state = $1', [location_state]);
+            if (!results.rows[0]) {
+                res.status(404).send(`Course(s) in state: ${location_state} not found`);
+            } else {
+                res.status(200).send(results.rows);
+            }
         }
-    );
+    }
 };
 
 // select course by ID from course table.
