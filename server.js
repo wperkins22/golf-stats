@@ -12,10 +12,10 @@ app.use(cors());
 
 app.use(bodyParser.json());
 
-// const roundsRouter = require('./server/rounds');
+const roundsRouter = require('./server/rounds');
 const coursesRouter = require('./server/courses');
 
-// app.use('/rounds', roundsRouter);
+app.use('/rounds', roundsRouter);
 app.use('/courses', coursesRouter);
 
 app.use((err, req, res, next) => {

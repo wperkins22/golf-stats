@@ -1,4 +1,4 @@
-const { pool, getAllCourses, getCourseByID, addCourse, updateCourse, deleteCourse } = require('./db');
+const { getAllCourses, getCourseByID, addCourse, updateCourse, deleteCourse } = require('./db');
 
 const coursesRouter = require('express').Router();
 
