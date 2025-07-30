@@ -65,20 +65,6 @@ paths:
           description: Default error sample response
       tags:
         - Add Rounds
-    delete:
-      summary: Delete all rounds
-      description: Delete all rounds data from the database
-      operationId: delete_rounds
-      responses:
-        '204':
-          content:
-            text/plain; charset=utf-8:
-              examples:
-                All Rounds:
-                  value: All rounds deleted.
-          description: No Content
-      tags:
-        - Delete Rounds
   /round/{id}:
     summary: Golf round data by ID
     description: This path deals with golf round data by round ID
