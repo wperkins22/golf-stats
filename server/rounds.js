@@ -1,4 +1,4 @@
-const { getAllRounds, getRoundByID, addRound, updateRound, deleteRound } = require('./db');
+const { getAllRounds, getRoundByID, addRound, updateRound, deleteRound, checkExistingRoundID } = require('./db');
 
 const roundsRouter = require('express').Router();
 
@@ -8,7 +8,7 @@ module.exports = roundsRouter;
 roundsRouter.get('/', getAllRounds);
 
 // GET round by ID
-roundsRouter.get('/:id', getRoundByID);
+roundsRouter.get('/:id', checkExistingRoundID, getRoundByID);
 
 // POST new round
 roundsRouter.post('/', addRound);
@@ -17,4 +17,4 @@ roundsRouter.post('/', addRound);
 roundsRouter.put('/:id', updateRound);
 
 // DELETE a round
-roundsRouter.delete('/:id', deleteRound);
+roundsRouter.delete('/:id', checkExistingRoundID, deleteRound);

@@ -8,13 +8,46 @@ const pool = new Pool({
     port: 5432
 });
 
+/* The following functions are middleware helpers for checking that an ID exists in course or round table */
+/* These will also set the requested id to req.id and the results of a select * query to req.results */
+
+const checkExistingCourseID = async (req, res, next) => {
+    req.id = parseInt(req.params.id);
+
+    try {
+        const results = await pool.query('SELECT * FROM course WHERE id = $1', [req.id]);
+        if (!results.rows[0]) {
+            req.results = null;
+        } else {
+            req.results = results;
+        }
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+
+const checkExistingRoundID = async (req, res, next) => {
+    req.id = parseInt(req.params.id);
+
+    try {
+        const results = await pool.query('SELECT * FROM round WHERE id = $1', [req.id]);
+        if (!results.rows[0]) {
+            req.results = null;
+        } else {
+            req.results = results;
+        }
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+
 /* The following functions are helpers for courses route */
 
 // select all courses from course table
 const getAllCourses = async (req, res, next) => {
-    console.log('In getAllCourses');
     if (!req.query.name && !req.query.location_state) {
-        console.log('In if (!req.query.name && !req.query.location_state)');
         await pool.query(
             'SELECT * FROM course',
             (error, results) => {
@@ -25,9 +58,7 @@ const getAllCourses = async (req, res, next) => {
             }
         );
     } else {
-        console.log('In else');
         if (req.query.name) {
-            console.log('In if(req.query.name)');
             const name = req.query.name;
             const results = await pool.query('SELECT * FROM course WHERE name = $1', [name]);
             if (!results.rows[0]) {
@@ -36,7 +67,6 @@ const getAllCourses = async (req, res, next) => {
                 res.status(200).send(results.rows);
             }
         } else if (req.query.location_state) {
-            console.log('In if (req.query.state)');
             const location_state = req.query.location_state;
             const results = await pool.query('SELECT * FROM course WHERE location_state = $1', [location_state]);
             if (!results.rows[0]) {
@@ -51,17 +81,10 @@ const getAllCourses = async (req, res, next) => {
 // select course by ID from course table.
 // requires a course ID to be included as parameter 
 const getCourseByID = async (req, res, next) => {
-    const id = parseInt(req.params.id);
-
-    try {
-        const results = await pool.query('SELECT * FROM course WHERE id = $1', [id]);
-        if (!results.rows[0]) {
-            res.status(404).send(`Course with ID: ${id} not found`)
-        } else {
-            res.status(200).json(results.rows);
-        }
-    } catch (error) {
-        next(error);
+    if (!req.results) {
+        res.status(404).send(`Course with ID: ${req.id} not found`)
+    } else {
+        res.status(200).json(req.results.rows);
     }
 };
 
@@ -123,16 +146,12 @@ const updateCourse = async (req, res, next) => {
 // delete a course from the course table
 // requires a course id to be passed in as parameter
 const deleteCourse = async (req, res, next) => {
-    const id = parseInt(req.params.id);
-
-    const test_id = await pool.query('SELECT * FROM course WHERE id = $1', [id]);
-
-    if (!test_id.rows[0]) {
-        res.status(404).send(`Course with ID: ${id} not found`);
+    if (!req.results) {
+        res.status(404).send(`Course with ID: ${req.id} not found`);
     } else {
         await pool.query(
             `DELETE FROM course WHERE id = $1`,
-            [id],
+            [req.id],
             (error, results) => {
                 if (error) {
                     next(error);
@@ -163,17 +182,10 @@ const getAllRounds = async (req, res, next) => {
 // select a single round by ID from round table
 // requires ID to be passed in as parameter
 const getRoundByID = async (req, res, next) => {
-    const id = req.params.id;
-
-    try {
-        const results = await pool.query('SELECT * FROM round WHERE id = $1', [id]);
-        if (!results.rows[0]) {
-            res.status(404).send(`Round with ID: ${id} not found`);
-        } else {
-            res.status(200).json(results.rows);
-        }
-    } catch (error) {
-        next(error);
+    if (!req.results) {
+        res.status(404).send(`Round with ID: ${req.id} not found`);
+    } else {
+        res.status(200).json(req.results.rows);
     }
 };
 
@@ -236,16 +248,12 @@ const updateRound = async (req, res, next) => {
 // delete a round from the round table
 // requires an ID to be passed in as parameter
 const deleteRound = async (req, res, next) => {
-    const id = parseInt(req.params.id);
-
-    const test_id = await pool.query('SELECT * FROM round WHERE id = $1', [id]);
-
-    if (!test_id.rows[0]) {
-        res.status(404).send(`Round with ID: ${id} not found`);
+    if (!req.results) {
+        res.status(404).send(`Round with ID: ${req.id} not found`);
     } else {
         await pool.query(
             'DELETE FROM round WHERE id = $1',
-            [id],
+            [req.id],
             (error, results) => {
                 if (error) {
                     next(error);
@@ -258,6 +266,8 @@ const deleteRound = async (req, res, next) => {
 }
 
 module.exports = {
+    checkExistingCourseID,
+    checkExistingRoundID,
     getAllCourses,
     getCourseByID,
     addCourse,

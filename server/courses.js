@@ -1,4 +1,4 @@
-const { getAllCourses, getCourseByID, addCourse, updateCourse, deleteCourse } = require('./db');
+const { getAllCourses, getCourseByID, addCourse, updateCourse, deleteCourse, checkExistingCourseID } = require('./db');
 
 const coursesRouter = require('express').Router();
 
@@ -8,7 +8,7 @@ module.exports = coursesRouter;
 coursesRouter.get('/', getAllCourses);
 
 // GET course by ID
-coursesRouter.get('/:id', getCourseByID);
+coursesRouter.get('/:id', checkExistingCourseID, getCourseByID);
 
 // POST new course
 coursesRouter.post('/', addCourse);
@@ -17,4 +17,4 @@ coursesRouter.post('/', addCourse);
 coursesRouter.put('/:id', updateCourse);
 
 // DELETE a course
-coursesRouter.delete('/:id', deleteCourse);
+coursesRouter.delete('/:id', checkExistingCourseID, deleteCourse);
